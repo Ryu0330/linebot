@@ -7,7 +7,7 @@ from linebot.models import (
 )
 from linebot import LineBotApi, WebhookHandler
 
-config = Configuration(access_token='LINE_CHANNEL_ACCESS_TOKEN')
+line_bot_api = LineBotApi('LINE_CHANNEL_ACCESS_TOKEN')
 handler = WebhookHandler('LINE_CHANNEL_SECRET')
 
 app = FastAPI()
@@ -19,11 +19,12 @@ async def callback(
 ):
     body = await request.body()
     body = body.decode()
+
     try:
         handler.handle(body,x_line_signature)
     except InvalidSignatureError:
         raise HTTPException(status_code=404, detail='InvalidSignatureError')
-    return 'np'
+    return 'success'
 
 @handler.add(MessageEvent)
 async def handle_message(event):
@@ -31,7 +32,7 @@ async def handle_message(event):
         return
     text=event.message.text
     reply_token=event.reply_token
-    await LineBotApi.reply_message(
+    await line_bot_api.reply_message(
         reply_token,
         TextMessage(text=text)
     )
