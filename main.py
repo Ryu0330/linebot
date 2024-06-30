@@ -18,7 +18,7 @@ async def callback(
     x_line_signature=Header(None)
 ):
     body = await request.body()
-    body = body.decode
+    body = body.decode()
     try:
         handler.handle(body,x_line_signature)
     except InvalidSignatureError:
@@ -26,13 +26,12 @@ async def callback(
     return 'np'
 
 @handler.add(MessageEvent)
-def handle_message(event):
+async def handle_message(event):
     if event.type != "text":
         return
-    
-    LineBotApi.reply_message(
-        reply_token=event.reply_token,
-        messages=TextMessage(text=event.message.text)
+    text=event.message.text
+    reply_token=event.reply_token
+    await LineBotApi.reply_message(
+        reply_token,
+        TextMessage(text=text)
     )
-
-
